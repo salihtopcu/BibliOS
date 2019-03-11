@@ -18,6 +18,7 @@ public extension DaoDelegate {
 
 public class Dao: NSObject {
     var url: String
+    var method: HTTPMethod
     var headers: [String: String] = [:]
     var urlData: [String: String] = [:]
     var bodyData: KVP = KVP()
@@ -42,8 +43,9 @@ public class Dao: NSObject {
     // override and run the http request here
     public func execute() { }
     
-    init(url: String, delegate: DaoDelegate?) {
+    init(url: String, method: HTTPMethod, delegate: DaoDelegate?) {
         self.url = url
+        self.method = method
         self.delegate = delegate
     }
     
@@ -76,4 +78,26 @@ public class Dao: NSObject {
         self.bodyData = data
     }
     
+}
+
+public class DaoError {
+    public var code: HTTPCode
+    private var _message: String?
+    public var message: String {
+        return self._message ?? self.getMessage() ?? HTTPCode.getMessage(of: self.code) ?? ""
+    }
+    
+    init(code: HTTPCode, message: String? = nil) {
+        self.code = code
+        self._message = message
+    }
+    
+    convenience init(intCode: Int, message: String? = nil) {
+        self.init(code: HTTPCode(rawValue: intCode) ?? .none, message: message)
+    }
+    
+    // Override to customize message
+    func getMessage() -> String? {
+        return nil
+    }
 }
