@@ -39,10 +39,11 @@ public enum HTTPCode: Int {
         .unauthorized: "Unauthorized",
         .notFound: "Not found",
         .notAcceptable: "Not acceptable",
-        .internalServerError: "Internal server error"
+        .internalServerError: "Internal server error",
+        .none: "Unextepced result"
     ]
     
-    public static func getMessage(of code: HTTPCode) -> String? {
-        return self.messages[code]
+    public static func getMessage(of code: HTTPCode) -> String {
+        return self.messages[code] ?? ""
     }
 }
