@@ -12,7 +12,7 @@ import Foundation
 //    func dao(didSuccess dao: Dao, data: Any?)
 //}
 
-public protocol DaoDelegate {
+public protocol DaoDelegate: AnyObject {
     func dao(didSuccess dao: Dao, data: Any?)
     
     func dao(didFail dao: Dao, error: DaoError)
@@ -32,7 +32,7 @@ open class Dao: NSObject {
     var headers: [String: String] = [:]
     var urlData: [String: String] = [:]
     var bodyData: MetaObject = MetaObject()
-    var delegate: DaoDelegate?
+    weak var delegate: DaoDelegate?
     private var successAction: DaoSuccessAction?
     private var failAction: DaoFailAction?
     

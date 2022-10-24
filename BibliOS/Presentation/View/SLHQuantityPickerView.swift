@@ -8,7 +8,7 @@
 
 import UIKit
 
-public protocol SLHQuantityPickerViewDelegate {
+public protocol SLHQuantityPickerViewDelegate: AnyObject {
     
     func mayQuantityChange(to value: Int, picker: SLHQuantityPickerView) -> Bool
     
@@ -27,7 +27,7 @@ extension SLHQuantityPickerViewDelegate {
 public class SLHQuantityPickerView: UIView {
     
     public var minusButtonCanGoNegative = false
-    public var delegate: SLHQuantityPickerViewDelegate?
+    public weak var delegate: SLHQuantityPickerViewDelegate?
     private var minusButton: UIButton!
     //    private var label: UILabel!
     private var number: UIButton!

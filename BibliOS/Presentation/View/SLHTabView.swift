@@ -8,7 +8,7 @@
 
 import UIKit
 
-public protocol SLHTabViewDelegate: NSObjectProtocol {
+public protocol SLHTabViewDelegate: AnyObject {
     func numberOfTabs(view: SLHTabView) -> Int
     func titleForTab(view: SLHTabView, index: Int) -> String
     func viewForTabContent(view: SLHTabView, index: Int, bounds: CGRect) -> UIView?
@@ -20,7 +20,7 @@ public extension SLHTabViewDelegate {
 
 
 public class SLHTabView: UIView {
-    private var delegate: SLHTabViewDelegate
+    private weak var delegate: SLHTabViewDelegate?
     
     private var isFirstLoad = true
     private var tabButtonsScrollView: UIScrollView!
@@ -57,52 +57,53 @@ public class SLHTabView: UIView {
             self.tabButtonsScrollView.showsHorizontalScrollIndicator = false
             self.addSubview(self.tabButtonsScrollView)
             
-            let tabCount = self.delegate.numberOfTabs(view: self)
-            let buttonWidth = max(self.frame.width / CGFloat(tabCount), self.tabButtonMinWidth)
-            var buttonLeft: CGFloat = 0
-            
-            self.tabButtons = [UIButton]()
-            for i in 0 ..< tabCount {
-                let button = UIButton(frame: CGRect(x: buttonLeft, y: 0, width: buttonWidth, height: self.tabButtonHeight))
-                button.setTitle(self.delegate.titleForTab(view: self, index: i), for: .normal)
-                button.backgroundColor = self.tabButtonBackgroundColor
-                button.setTitleColor(self.tabButtonTitleColor, for: .normal)
-                button.titleLabel!.textAlignment = .center
-                button.titleLabel?.numberOfLines = 2
-                button.titleLabel?.font = UIFont.boldSystemFont(ofSize: self.tabButtonTitleFontSize)
-                button.tag = i
-                button.addTarget(self, action: #selector(tabButtonAction(_:)), for: .touchUpInside)
-                self.tabButtonsScrollView.addSubview(button)
-                self.tabButtons.append(button)
+            if let tabCount = self.delegate?.numberOfTabs(view: self) {
+                let buttonWidth = max(self.frame.width / CGFloat(tabCount), self.tabButtonMinWidth)
+                var buttonLeft: CGFloat = 0
                 
-                buttonLeft += buttonWidth
-            }
-            tabButtonsScrollView.contentSize = CGSize(width: buttonLeft, height: self.tabButtonHeight)
-            
-            self.buttonIndicator = UIView(frame: CGRect(x: 0, y: self.tabButtonHeight - 2.5, width: buttonWidth, height: 2.5))
-            self.buttonIndicator.backgroundColor = self.activeTabButtonIndicatorColor
-            self.tabButtonsScrollView.addSubview(self.buttonIndicator)
-            
-            //            self.contentContainer = UIView(frame: CGRect(x: 0, y: self.tabButtonHeight, width: self.frame.width, height: self.frame.height - self.tabButtonHeight))
-            //            self.contentContainer.layer.masksToBounds = true
-            //            self.addSubview(contentContainer)
-            
-            self.tabContents = [UIView]()
-            let contentFrame = CGRect(x: 0, y: self.tabButtonHeight, width: self.frame.width, height: self.frame.height - self.tabButtonHeight)
-            for _ in 0 ..< tabCount {
-                let contentView = UIView(frame: contentFrame)
-                contentView.layer.masksToBounds = true
-                self.addSubview(contentView)
-                self.tabContents.append(contentView)
-            }
-            
-            if tabCount > 0 {
-                if self.currentTabIndex < 0 {
-                    currentTabIndex = 0
+                self.tabButtons = [UIButton]()
+                for i in 0 ..< tabCount {
+                    let button = UIButton(frame: CGRect(x: buttonLeft, y: 0, width: buttonWidth, height: self.tabButtonHeight))
+                    button.setTitle(self.delegate?.titleForTab(view: self, index: i), for: .normal)
+                    button.backgroundColor = self.tabButtonBackgroundColor
+                    button.setTitleColor(self.tabButtonTitleColor, for: .normal)
+                    button.titleLabel!.textAlignment = .center
+                    button.titleLabel?.numberOfLines = 2
+                    button.titleLabel?.font = UIFont.boldSystemFont(ofSize: self.tabButtonTitleFontSize)
+                    button.tag = i
+                    button.addTarget(self, action: #selector(tabButtonAction(_:)), for: .touchUpInside)
+                    self.tabButtonsScrollView.addSubview(button)
+                    self.tabButtons.append(button)
+                    
+                    buttonLeft += buttonWidth
                 }
-                self.displayTab(index: currentTabIndex)
+                tabButtonsScrollView.contentSize = CGSize(width: buttonLeft, height: self.tabButtonHeight)
+                
+                self.buttonIndicator = UIView(frame: CGRect(x: 0, y: self.tabButtonHeight - 2.5, width: buttonWidth, height: 2.5))
+                self.buttonIndicator.backgroundColor = self.activeTabButtonIndicatorColor
+                self.tabButtonsScrollView.addSubview(self.buttonIndicator)
+                
+                //            self.contentContainer = UIView(frame: CGRect(x: 0, y: self.tabButtonHeight, width: self.frame.width, height: self.frame.height - self.tabButtonHeight))
+                //            self.contentContainer.layer.masksToBounds = true
+                //            self.addSubview(contentContainer)
+                
+                self.tabContents = [UIView]()
+                let contentFrame = CGRect(x: 0, y: self.tabButtonHeight, width: self.frame.width, height: self.frame.height - self.tabButtonHeight)
+                for _ in 0 ..< tabCount {
+                    let contentView = UIView(frame: contentFrame)
+                    contentView.layer.masksToBounds = true
+                    self.addSubview(contentView)
+                    self.tabContents.append(contentView)
+                }
+                
+                if tabCount > 0 {
+                    if self.currentTabIndex < 0 {
+                        currentTabIndex = 0
+                    }
+                    self.displayTab(index: currentTabIndex)
+                }
+                self.isFirstLoad = false
             }
-            self.isFirstLoad = false
         }
     }
     
@@ -127,7 +128,7 @@ public class SLHTabView: UIView {
             if self.tabContents[index].subviews.count == 0 {
                 self.refreshTabContent(index: index)
             }
-            self.delegate.didDisplayTab(view: self, oldIndex: oldIndex, newIndex: index)
+            self.delegate?.didDisplayTab(view: self, oldIndex: oldIndex, newIndex: index)
             self.tabButtonsScrollView.scrollRectToVisible(self.tabButtons[index].frame, animated: true)
             SLHAnimationManager(view: self.buttonIndicator, hasLoop: false, milestones: [AnimationMilestone(duration: 0.3, frame: CGRect(x: self.tabButtons[index].frame.origin.x, y: self.buttonIndicator.top, width: self.buttonIndicator.width, height: self.buttonIndicator.height))]).animate()
         }
@@ -138,7 +139,7 @@ public class SLHTabView: UIView {
             for view in self.tabContents[index].subviews {
                 view.removeFromSuperview()
             }
-            let innerContent = self.delegate.viewForTabContent(view: self, index: index, bounds: self.tabContents[index].bounds)
+            let innerContent = self.delegate?.viewForTabContent(view: self, index: index, bounds: self.tabContents[index].bounds)
             if innerContent != nil {
                 self.tabContents[index].addSubview(innerContent!)
                 if (innerContent!.frame == CGRect.null) {

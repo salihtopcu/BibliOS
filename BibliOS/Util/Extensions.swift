@@ -580,17 +580,17 @@ public extension UIView {
     func fadeIn(_ duration: Double = 0.3, alpha: CGFloat = 1) {
         self.alpha = 0
         self.isHidden = false
-        UIView.animate(withDuration: duration, animations: {
-            self.alpha = alpha
+        UIView.animate(withDuration: duration, animations: { [weak self] in
+            self?.alpha = alpha
         })
     }
     
     func fadeOut(_ duration: Double = 0.3, alpha: CGFloat = 0) {
         self.isHidden = false
-        UIView.animate(withDuration: duration, animations: {
-            self.alpha = alpha
-        }, completion: { value in
-            self.isHidden = true
+        UIView.animate(withDuration: duration, animations: { [weak self] in
+            self?.alpha = alpha
+        }, completion: { [weak self] value in
+            self?.isHidden = true
         })
     }
     
