@@ -46,7 +46,7 @@ public enum AKPickerViewStyle {
 /**
  Private. Used to deliver the style of the picker.
  */
-private protocol AKCollectionViewLayoutDelegate {
+private protocol AKCollectionViewLayoutDelegate: AnyObject {
     func pickerViewStyleForCollectionViewLayout(_ layout: AKCollectionViewLayout) -> AKPickerViewStyle
 }
 
@@ -113,7 +113,7 @@ private class AKCollectionViewCell: UICollectionViewCell {
  Private. A subclass of UICollectionViewFlowLayout used in the collection view.
  */
 private class AKCollectionViewLayout: UICollectionViewFlowLayout {
-    var delegate: AKCollectionViewLayoutDelegate!
+    weak var delegate: AKCollectionViewLayoutDelegate?
     var width: CGFloat!
     var midX: CGFloat!
     var maxAngle: CGFloat!
@@ -147,7 +147,10 @@ private class AKCollectionViewLayout: UICollectionViewFlowLayout {
     
     fileprivate override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         if let attributes = super.layoutAttributesForItem(at: indexPath)?.copy() as? UICollectionViewLayoutAttributes {
-            switch self.delegate.pickerViewStyleForCollectionViewLayout(self) {
+            guard let style = self.delegate?.pickerViewStyleForCollectionViewLayout(self)
+            else { return nil }
+
+            switch style {
             case .flat:
                 return attributes
             case .wheel:
@@ -167,7 +170,10 @@ private class AKCollectionViewLayout: UICollectionViewFlowLayout {
     }
     
     private func layoutAttributesForElementsInRect(_ rect: CGRect) -> [Any]? {
-        switch self.delegate.pickerViewStyleForCollectionViewLayout(self) {
+        guard let style = self.delegate?.pickerViewStyleForCollectionViewLayout(self) else
+        { return nil }
+
+        switch style {
         case .flat:
             return super.layoutAttributesForElements(in: rect)
         case .wheel:

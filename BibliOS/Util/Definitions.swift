@@ -44,14 +44,14 @@ public class Currency {
     public static let tl = Currency(name: "Türk Lirası", code: "TL", symbol: "₺")
     public static let usd = Currency(name: "U.S. Dollar", code: "USD", symbol: "$")
     public static let gbp = Currency(name: "British Pound Sterling", code: "GBP", symbol: "£")
-    public static let chf = Currency(name: "Confoederatio Helvatica Franc", code: "CHF", symbol: "CHF")
+    public static let chf = Currency(name: "Confoederatio Helvatica Franc", code: "CHF", symbol: "CHf")
+    public static let cfa = Currency(name: "West African CFA franc", code: "CFA", symbol: "CFA")
     public static let unknown = Currency(name: "Unknown", code: "UNKNOWN", symbol: "*")
     
-    private static let list: [Currency] = [Currency.euro, Currency.tl, Currency.usd, Currency.gbp, Currency.chf]
+    private static let list: [Currency] = [Currency.euro, Currency.tl, Currency.usd, Currency.gbp, Currency.chf, Currency.cfa]
     
     public static func getWith(code: String) -> Currency {
-        let filterResult = Currency.list.filter { $0.code == code }
-        return filterResult.count > 0 ? filterResult[0] : Currency.unknown
+        return Currency.list.first(where: { $0.code == code }) ?? Currency.unknown
     }
     
     public static func getWith(symbol: String) -> Currency {
