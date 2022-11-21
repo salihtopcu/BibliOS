@@ -44,7 +44,7 @@ public class Currency {
     public static let tl = Currency(name: "Türk Lirası", code: "TL", symbol: "₺")
     public static let usd = Currency(name: "U.S. Dollar", code: "USD", symbol: "$")
     public static let gbp = Currency(name: "British Pound Sterling", code: "GBP", symbol: "£")
-    public static let chf = Currency(name: "Confoederatio Helvatica Franc", code: "CHF", symbol: "CHf")
+    public static let chf = Currency(name: "Confoederatio Helvatica Franc", code: "CHF", symbol: "CHF")
     public static let cfa = Currency(name: "West African CFA franc", code: "CFA", symbol: "CFA")
     public static let unknown = Currency(name: "Unknown", code: "UNKNOWN", symbol: "*")
     
